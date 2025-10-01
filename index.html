@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Triage Beslis App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    label, select, input, fieldset {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+    }
+    input[type="number"], input[type="text"], select {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    fieldset {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    legend {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .redflag-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #evaluateBtn {
+      background-color: #3498db;
+      color: white;
+    }
+    #resetBtn {
+      background-color: #e74c3c;
+      color: white;
+      margin-left: 10px;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Triage Beslis Tool</h2>
+
+    <label>Leeftijd:
+      <input type="number" id="age" min="0" max="120">
+    </label>
+
+    <label>Klachtregio:
+      <select id="region">
+        <option value="">--Selecteer--</option>
+        <option value="knee">Knie</option>
+        <option value="ankle">Enkel</option>
+        <option value="foot">Voet</option>
+        <option value="hip">Heup</option>
+        <option value="back">Rug</option>
+        <option value="neck">Nek</option>
+        <option value="shoulder">Schouder</option>
+        <option value="elbow">Elleboog</option>
+        <option value="wrist">Pols</option>
+        <option value="hand">Hand</option>
+        <option value="thigh">Bovenbeen</option>
+        <option value="calf">Kuit</option>
+        <option value="other">Overig</option>
+      </select>
+    </label>
+
+    <label>Duur van de klacht:
+      <input type="text" id="duration" placeholder="bijv. 2 weken">
+    </label>
+
+    <fieldset>
+      <legend>Rode vlaggen (vink aan indien van toepassing):</legend>
+      <div class="redflag-group">
+        <label><input type="checkbox" class="redflag"> Trauma</label>
+        <label><input type="checkbox" class="redflag"> Nachtelijke pijn</label>
+        <label><input type="checkbox" class="redflag"> Koorts</label>
+        <label><input type="checkbox" class="redflag"> Tintelingen of zwakte</label>
+        <label><input type="checkbox" class="redflag"> Zwelling of roodheid</label>
+        <label><input type="checkbox" class="redflag"> Misvorming</label>
+        <label><input type="checkbox" class="redflag"> Gewichtsverlies / malaise</label>
+        <label><input type="checkbox" class="redflag"> Open wond / infectie</label>
+        <label><input type="checkbox" class="redflag"> Ernstige rustpijn</label>
+        <label><input type="checkbox" class="redflag"> Geen gebruik van ledemaat > 24u</label>
+      </div>
+    </fieldset>
+
+    <button id="evaluateBtn" onclick="runEvaluation()">Beoordeel</button>
+    <button id="resetBtn" onclick="resetForm()">Reset</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function runEvaluation() {
+      const ageInput = document.getElementById('age').value;
+      const region = document.getElementById('region').value;
+      const redFlags = document.querySelectorAll('.redflag:checked');
+      const resultBox = document.getElementById('result');
+      resultBox.innerText = '';
+
+      if (!ageInput || isNaN(ageInput)) {
+        resultBox.innerText = '❗ Vul een geldige leeftijd in.';
+        return;
+      }
+
+      const age = parseInt(ageInput);
+
+      if (!region) {
+        resultBox.innerText = '❗ Selecteer een klachtregio.';
+        return;
+      }
+
+      const orthoRegions = ['knee', 'ankle', 'foot', 'hip', 'back', 'neck', 'shoulder', 'elbow', 'wrist', 'hand', 'thigh', 'calf'];
+
+      let result = '';
+
+      if (redFlags.length > 0) {
+        result = '⚠️ Neem direct contact op met uw (huis)arts vanwege rode vlaggen.';
+      } else if (age < 18 && orthoRegions.includes(region)) {
+        result = '👶 Verwijs naar een Kinderfysiotherapeut.';
+      } else {
+        result = '🧑 Verwijs naar een Algemeen Fysiotherapeut.';
+      }
+
+      resultBox.innerText = result;
+    }
+
+    function resetForm() {
+      document.getElementById('age').value = '';
+      document.getElementById('region').value = '';
+      document.getElementById('duration').value = '';
+      document.querySelectorAll('.redflag').forEach(cb => cb.checked = false);
+      document.getElementById('result').innerText = '';
+    }
+  </script>
+</body>
+</html>
